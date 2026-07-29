@@ -48,7 +48,7 @@ def settings():
         mapepire_query_trace_enabled=False,
         mapepire_slow_query_ms=750,
         allowed_read_schemas=("QSYS2",),
-        allowed_write_schema="MONAI",
+        allowed_write_schema="APPDATA",
         allowed_functions=("COUNT",),
         max_sql_length=1000,
         max_parameters=10,

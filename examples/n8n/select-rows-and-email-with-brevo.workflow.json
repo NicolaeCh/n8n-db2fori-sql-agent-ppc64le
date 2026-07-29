@@ -1,0 +1,128 @@
+{
+  "name": "IBM i rows by email - Db2 SQL Agent and Brevo",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -620,
+        0
+      ],
+      "id": "71d58152-eb02-4f74-a589-97244b955d1c",
+      "name": "Run workflow manually"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://n8n-db2-sql-agent:8080/api/v1/sql/select",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"sql\": \"SELECT CUSTOMER_ID, CUSTOMER_NAME, EMAIL FROM MYLIB.CUSTOMERS ORDER BY CUSTOMER_ID FETCH FIRST 100 ROWS ONLY\",\n  \"parameters\": []\n}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -380,
+        0
+      ],
+      "id": "c697953c-184b-4d2a-b057-c273c10338aa",
+      "name": "Select rows from IBM i",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_WITH_DB2_AGENT_CREDENTIAL_ID",
+          "name": "Db2 SQL Agent X-API-Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.first().json;\nconst rows = Array.isArray(response.data) ? response.data : [];\n\nconst escapeHtml = (value) => String(value ?? '')\n  .replaceAll('&', '&amp;')\n  .replaceAll('<', '&lt;')\n  .replaceAll('>', '&gt;')\n  .replaceAll('\\\"', '&quot;')\n  .replaceAll(\"'\", '&#39;');\n\nlet tableHtml;\nif (rows.length === 0) {\n  tableHtml = '<p>The query returned no rows.</p>';\n} else {\n  const columns = Object.keys(rows[0]);\n  const header = columns.map((column) => `<th style=\\\"padding:8px;border:1px solid #ccc;text-align:left\\\">${escapeHtml(column)}</th>`).join('');\n  const body = rows.map((row) => {\n    const cells = columns.map((column) => `<td style=\\\"padding:8px;border:1px solid #ccc\\\">${escapeHtml(row[column])}</td>`).join('');\n    return `<tr>${cells}</tr>`;\n  }).join('');\n  tableHtml = `<table style=\\\"border-collapse:collapse;font-family:Arial,sans-serif;font-size:13px\\\"><thead><tr>${header}</tr></thead><tbody>${body}</tbody></table>`;\n}\n\nreturn [{\n  json: {\n    subject: `IBM i table extract - ${rows.length} row(s)`,\n    htmlContent: `<h2>IBM i table extract</h2><p>Rows returned: <strong>${rows.length}</strong></p>${tableHtml}<p style=\\\"font-size:12px;color:#666\\\">Request ID: ${escapeHtml(response.request_id || '')}</p>`,\n    textContent: `IBM i table extract\\nRows returned: ${rows.length}\\nRequest ID: ${response.request_id || ''}`,\n    rowCount: rows.length\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -120,
+        0
+      ],
+      "id": "6f6ac45c-a52c-4684-b2b6-9fab070dfef8",
+      "name": "Build HTML email"
+    },
+    {
+      "parameters": {
+        "resource": "email",
+        "operation": "send",
+        "sendHTML": true,
+        "subject": "={{ $json.subject }}",
+        "htmlContent": "={{ $json.htmlContent }}",
+        "sender": "IBM i Reports <sender@example.com>",
+        "receipients": "recipient@example.com",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.sendInBlue",
+      "typeVersion": 1,
+      "position": [
+        140,
+        0
+      ],
+      "id": "2b55d7a3-ae83-4c94-9f8d-ffdc809a42af",
+      "name": "Send email with Brevo",
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "REPLACE_WITH_BREVO_CREDENTIAL_ID",
+          "name": "Brevo account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Run workflow manually": {
+      "main": [
+        [
+          {
+            "node": "Select rows from IBM i",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select rows from IBM i": {
+      "main": [
+        [
+          {
+            "node": "Build HTML email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build HTML email": {
+      "main": [
+        [
+          {
+            "node": "Send email with Brevo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "83441b74-7667-4ed9-a3cc-91268ed1d797",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

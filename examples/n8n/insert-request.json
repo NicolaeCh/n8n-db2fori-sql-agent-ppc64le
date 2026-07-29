@@ -1,4 +1,4 @@
 {
-  "sql": "INSERT INTO MONAI.ALERT_AUDIT (ALERT_ID, STATUS, CREATED_AT) VALUES (?, ?, CURRENT_TIMESTAMP)",
-  "parameters": ["{{$json.alert_id}}", "RECEIVED"]
+  "sql": "INSERT INTO APPDATA.EVENT_AUDIT (EVENT_ID, STATUS, CREATED_AT) VALUES (?, ?, CURRENT_TIMESTAMP)",
+  "parameters": ["{{$json.event_id}}", "RECEIVED"]
 }

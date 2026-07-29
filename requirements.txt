@@ -1,4 +1,7 @@
 fastapi>=0.103,<0.116
 pydantic>=1.10.17,<2
 uvicorn>=0.23,<1
-mapepire-python>=0.2,<1
+mapepire-python==0.3.0
+# Mapepire 0.3.0 imports gssapi unconditionally on non-Windows systems,
+# although it is not declared as a normal runtime dependency upstream.
+gssapi>=1.8,<2

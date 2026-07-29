@@ -1,20 +1,19 @@
-Validation performed on 2026-07-29
+Standalone n8n Db2 for i SQL Agent 1.0.1
+Validation date: 2026-07-29
 
-1. Python compilation
-   python -m compileall -q app tests
-   Result: PASS
+Completed offline checks:
+- Python source compilation: PASS
+- SQL policy tests: PASS
+- SQLJob pool tests: PASS
+- Importable n8n workflow JSON syntax: PASS
+- Repository scan for disallowed project references: PASS
+- Containerfile includes native ppc64le gssapi build dependencies: PASS
+- Container build-time import check for gssapi and Mapepire SQLJob: PRESENT
 
-2. Offline unit tests
-   PYTHONPATH=. pytest -q
-   Result: 25 passed
+The image could not be built natively in this execution environment because a
+ppc64le container runtime and external package registries were not available.
+The Containerfile performs an import verification during the actual image build,
+so a missing or unusable gssapi module causes the build to fail rather than the
+container to fail later at application startup.
 
-3. FastAPI smoke test with a mocked Mapepire SQLJob
-   - Application startup and four-job pool initialization: PASS
-   - GET /health/live: HTTP 200
-   - POST /api/v1/sql/select without X-API-Key: HTTP 401
-   - POST /api/v1/sql/select with X-API-Key: HTTP 200
-   - Normalized result body: PASS
-
-Not performed in this environment:
-- Native ppc64le container image build (requires registry/PyPI network access).
-- Live Mapepire/Db2 for i integration test (requires IBM i credentials and server access).
+A live Mapepire/Db2 for i integration test requires access to the target IBM i.

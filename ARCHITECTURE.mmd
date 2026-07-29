@@ -1,9 +1,10 @@
 flowchart LR
-  G[Grafana alert] --> N[n8n workflow]
-  N -->|X-API-Key + operation-specific JSON| A[n8n Db2 SQL Agent<br/>ppc64le container]
+  N[n8n workflow] -->|X-API-Key + operation-specific JSON| A[n8n Db2 SQL Agent<br/>ppc64le container]
   A --> P[Local Mapepire SQLJob pool]
   P --> M[Mapepire Server<br/>on IBM i]
   M --> D[(Db2 for i)]
+  N --> B[Brevo node]
+  B --> E[Email recipients]
 
   subgraph Agent controls
     K[X-API-Key]
