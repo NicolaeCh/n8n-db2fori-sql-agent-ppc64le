@@ -1,0 +1,4 @@
+{
+  "sql": "UPDATE MONAI.ALERT_AUDIT SET STATUS = ?, UPDATED_AT = CURRENT_TIMESTAMP WHERE ALERT_ID = ?",
+  "parameters": ["PROCESSED", "{{$json.alert_id}}"]
+}

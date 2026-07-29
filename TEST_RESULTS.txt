@@ -1,0 +1,20 @@
+Validation performed on 2026-07-29
+
+1. Python compilation
+   python -m compileall -q app tests
+   Result: PASS
+
+2. Offline unit tests
+   PYTHONPATH=. pytest -q
+   Result: 25 passed
+
+3. FastAPI smoke test with a mocked Mapepire SQLJob
+   - Application startup and four-job pool initialization: PASS
+   - GET /health/live: HTTP 200
+   - POST /api/v1/sql/select without X-API-Key: HTTP 401
+   - POST /api/v1/sql/select with X-API-Key: HTTP 200
+   - Normalized result body: PASS
+
+Not performed in this environment:
+- Native ppc64le container image build (requires registry/PyPI network access).
+- Live Mapepire/Db2 for i integration test (requires IBM i credentials and server access).

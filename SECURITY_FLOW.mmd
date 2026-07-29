@@ -1,0 +1,18 @@
+flowchart TD
+  A[Receive request] --> B{Valid X-API-Key?}
+  B -- No --> X1[401]
+  B -- Yes --> C{Exactly one statement?}
+  C -- No --> X2[400 reject]
+  C -- Yes --> D{First verb matches endpoint?}
+  D -- No --> X2
+  D -- Yes --> E{Forbidden keyword or routine?}
+  E -- Yes --> X2
+  E -- No --> F{All read objects qualified and allowlisted?}
+  F -- No --> X2
+  F -- Yes --> G{Write target equals configured write schema?}
+  G -- No --> X2
+  G -- Yes --> H{Placeholder count matches parameters?}
+  H -- No --> X2
+  H -- Yes --> I[Acquire pooled SQLJob]
+  I --> J[Execute prepared SQL]
+  J --> K[Return normalized JSON]

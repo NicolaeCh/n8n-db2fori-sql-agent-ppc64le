@@ -1,0 +1,19 @@
+flowchart LR
+  G[Grafana alert] --> N[n8n workflow]
+  N -->|X-API-Key + operation-specific JSON| A[n8n Db2 SQL Agent<br/>ppc64le container]
+  A --> P[Local Mapepire SQLJob pool]
+  P --> M[Mapepire Server<br/>on IBM i]
+  M --> D[(Db2 for i)]
+
+  subgraph Agent controls
+    K[X-API-Key]
+    V[SQL verb and single-statement validation]
+    R[Read schema allowlist]
+    W[Single write schema]
+    F[SQL function allowlist]
+  end
+  K --> A
+  V --> A
+  R --> A
+  W --> A
+  F --> A
