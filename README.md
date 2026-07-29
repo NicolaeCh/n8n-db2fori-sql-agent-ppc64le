@@ -1,4 +1,4 @@
-# Standalone n8n Db2 for i SQL Agent — ppc64le
+# Standalone n8n Db2 for i SQL Node — ppc64le
 
 A standalone, restricted SQL API for n8n workflows. The service runs in a rootless ppc64le container, connects to Db2 for i through Mapepire, and exposes a separate endpoint for each permitted operation.
 
@@ -73,34 +73,6 @@ WEB_CONCURRENCY × MAPEPIRE_POOL_SIZE
 
 With pooling disabled, the service opens and closes one SQLJob per request.
 
-## Correction for `ModuleNotFoundError: gssapi`
-
-Mapepire 0.3.0 imports its Kerberos provider on Linux during package initialization. That provider imports `gssapi`, but `gssapi` is not declared as a normal Mapepire runtime dependency.
-
-This project corrects that packaging gap in two places:
-
-1. `requirements.txt` explicitly installs `gssapi`.
-2. The multi-stage `Containerfile` builds the Python GSSAPI extension natively for ppc64le using `gcc`, `krb5-devel` and `python3.11-devel`.
-
-Only `krb5-libs` and the compiled Python wheels are retained in the final image. The image build also runs this verification before completing:
-
-```bash
-python -c "import gssapi; from mapepire_python import SQLJob"
-```
-
-Rebuild without the previous cached dependency layer:
-
-```bash
-podman compose down
-podman build --no-cache \
-  --platform linux/ppc64le \
-  -t localhost/n8n-db2-sql-agent-ppc64le:1.0.1 \
-  -f Containerfile .
-podman compose up -d --force-recreate
-podman compose logs -f n8n-db2-sql-agent
-```
-
-If the build reaches `Mapepire and gssapi imports verified`, the import problem is resolved inside the image.
 
 ## Environment configuration
 
