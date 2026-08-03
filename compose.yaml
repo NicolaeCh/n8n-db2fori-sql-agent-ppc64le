@@ -13,7 +13,7 @@ services:
       - "${SQL_AGENT_BIND_ADDRESS:-127.0.0.1}:${SQL_AGENT_PORT:-8080}:8080"
     networks:
       - n8n-db2-agent-net
-      - ibmi-monitor-backend
+      - n8n-backend
     restart: unless-stopped
     read_only: true
     tmpfs:
@@ -38,6 +38,6 @@ networks:
     name: n8n-db2-sql-agent
     driver: bridge
 
-  ibmi-monitor-backend:
+  n8n-backend:
     external: true
-    name: ibmi-monitor-ai_backend-net
+    name: n8n-ppc64le_n8n_net
